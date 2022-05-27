@@ -1,0 +1,168 @@
+<template>
+  <div class="table-content">
+    <el-table
+      :data="table.tableData"
+      empty-text="暂无数据~"
+      border
+      :height="tableHeight"
+    >
+      <template v-for="(item, index) in table.header">
+        <el-table-column
+          type="selection"
+          :width="item.width"
+          :min-width="item.minWidth"
+          v-if="item.prop == 'selection'"
+          :key="index"
+          align="center"
+        >
+          <!-- 表头复选框 -->
+        </el-table-column>
+        <template v-else-if="item.dia">
+          <el-table-column
+            :prop="item.prop"
+            :label="item.label"
+            :width="item.width"
+            :fixed="item.fixed"
+            :min-width="item.minWidth"
+            :key="index"
+            align="center"
+          >
+            <!-- 弹窗显示 -->
+            <template slot-scope="scope">
+              <el-button
+                v-for="(btn, ind) in item.tableOption"
+                :key="ind"
+                :type="btn.type"
+                @click="openDia(btn.methods, scope.row[item.prop])"
+              >
+                {{ btn.label }}
+              </el-button>
+            </template>
+          </el-table-column>
+        </template>
+        <el-table-column
+          v-else-if="item.status"
+          :prop="item.prop"
+          :label="item.label"
+          :min-width="item.minWidth"
+          :width="item.width"
+          :fixed="item.fixed"
+          :key="item.prop"
+          align="center"
+        >
+          <!-- 颜色渲染 -->
+          <template slot-scope="scope">
+            <span>{{ scope.row[item.prop] | changeStatus(item.filters) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          v-else-if="item.color"
+          :prop="item.prop"
+          :label="item.label"
+          :min-width="item.minWidth"
+          :width="item.width"
+          :fixed="item.fixed"
+          :key="item.prop"
+          align="center"
+        >
+          <!-- 颜色渲染 -->
+          <template slot-scope="scope">
+            <div :style="`background-color:${scope.row[item.prop]};`">
+              {{ scope.row[item.prop] }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column
+          v-else-if="item.control"
+          :prop="item.prop"
+          :label="item.label"
+          :min-width="item.minWidth"
+          :width="item.width"
+          :fixed="item.fixed"
+          :key="item.prop"
+          align="center"
+        >
+          <!-- 右侧操作 -->
+          <template slot-scope="scope">
+            <el-button
+              v-for="(btn, ind) in item.tableOption"
+              :key="ind"
+              :type="btn.type"
+              @click="handButton(btn.methods, scope.row, scope.$index)"
+            >
+              {{ btn.label }}
+            </el-button>
+          </template>
+        </el-table-column>
+        <el-table-column
+          v-else
+          :prop="item.prop"
+          :label="item.label"
+          :min-width="item.minWidth"
+          :width="item.width"
+          :fixed="item.fixed"
+          :key="index"
+          align="center"
+        >
+          <!-- 正常显示，不做转换 -->
+        </el-table-column>
+      </template>
+    </el-table>
+    <el-dialog title="提示" :visible.sync="dialogVisible" width="30%">
+      <span>{{ propsMsg }}</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogVisible = false"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    table: {
+      type: Object,
+      required: true,
+    },
+    tableHeight: {
+      type: String,
+      default: () => {},
+    },
+  },
+  data() {
+    return {
+      propsMsg: "",
+      dialogVisible: false,
+    };
+  },
+  filters: {
+    changeStatus(val, func) {
+      return typeof func === "function" ? func(val) : val;
+    },
+  },
+  methods: {
+    handButton(methods, row, index) {
+      this.$emit("handButton", { methods: methods, row: row, index: index });
+    },
+    openDia(methods, row) {
+      this.dialogVisible = true;
+      this.propsMsg = row;
+      this.$emit("openDia", row);
+    },
+  },
+};
+/**
+ * dia  boolean 弹窗
+ * control boolean 操作
+ * prop
+ * label
+ * width
+ * fixed
+ * min
+ * key
+ */
+</script>
+
+<style scoped></style>
