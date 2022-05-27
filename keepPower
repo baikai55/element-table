@@ -1,0 +1,120 @@
+<template>
+  <div>
+    <div class="content">
+      <TableComponent
+        :table="table"
+        :tableHeight="tableHeight"
+        @handButton="handButton"
+        @openDia="openDia"
+        :changeStatus="$options.filters.changeStatus"
+      ></TableComponent>
+    </div>
+  </div>
+</template>
+
+<script>
+import TableComponent from "@/components/table/tableComponent.vue";
+import request from "@/utils/request";
+export default {
+  components: {
+    TableComponent,
+  },
+  data() {
+    return {
+      tableHeight: "375px",
+      table: {
+        tableData: [],
+        header: [
+          // { prop: "selection", width: "50px" },
+          { prop: "app_code", label: "应用编码", minWidth: "100px" },
+          { prop: "app_name", label: "应用名称", minWidth: "100px" },
+          {
+            prop: "app_id",
+            label: "企业编码",
+            dia: true,
+            tableOption: [{ type: "text", label: "查看企业编码" }],
+            minWidth: "140px",
+          },
+          {
+            prop: "app_key",
+            label: "应用密钥",
+            dia: true,
+            tableOption: [{ type: "text", label: "查看应用密钥" }],
+            minWidth: "140px",
+          },
+          {
+            prop: "app_url",
+            label: "请求地址",
+            dia: true,
+            tableOption: [{ type: "text", label: "查看请求地址" }],
+            minWidth: "140px",
+          },
+          { prop: "app_name", label: "应用名称", minWidth: "140px" },
+          {
+            prop: "app_token",
+            label: "接口令牌",
+            dia: true,
+            minWidth: "140px",
+            tableOption: [{ type: "text", label: "查看应用名称" }],
+          },
+          {
+            prop: "web_token",
+            label: "页面令牌",
+            dia: true,
+            minWidth: "140px",
+            tableOption: [{ type: "text", label: "查看页面令牌" }],
+          },
+          {
+            prop: "status",
+            label: "页面状态",
+            status: true,
+            filters: (val) => {
+              return val == 0 ? "失效" : "正常";
+            },
+          },
+          { prop: "app_color", label: "背景颜色", color: true },
+          {
+            label: "操作",
+            fixed: "right",
+            tableOption: [
+              { type: "text", label: "查看", methods: "showDia" },
+              { type: "text", label: "删除", methods: "dele" },
+            ],
+            control: true,
+          },
+        ],
+      },
+    };
+  },
+  created() {
+    this.getTableData();
+  },
+  filters: {
+    changeStatus(val) {
+      console.log(val, "val");
+      return val;
+    },
+  },
+  methods: {
+    handButton(val) {
+      // if (val.methods === "showDia") {
+      //   console.log("查看");
+      // } else {
+      //   console.log("删除");
+      // }
+      console.log(val);
+    },
+    openDia(bool) {
+      console.log(bool);
+    },
+    getTableData() {
+      request.get("/api/appcontrol/getdata").then((res) => {
+        this.table.tableData = res.data.data;
+        console.log(this.table.tableData, "this.tableData");
+      });
+    },
+  },
+};
+</script>
+
+<style></style>
